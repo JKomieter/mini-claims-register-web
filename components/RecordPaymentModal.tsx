@@ -101,6 +101,12 @@ export default function RecordPaymentModal({
             currency: Currency;
             exchangeRate: number;
         }) => {
+            // if claim has not being approved, do not record payment
+            const approvedAmount = claims?.find((claim) => claim.id === values.claimId)?.approved_amount;
+            if (approvedAmount === null || approvedAmount === undefined) {
+                throw new Error("Cannot record payment for a claim that has not been approved.");
+            }
+
             const response = await fetch(`${API_URL}/payments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
