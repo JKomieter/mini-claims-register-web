@@ -1,5 +1,6 @@
-import { formatCurrency } from "@/utils/currency";
-import React from "react";
+import { ClaimsQueryResult } from "@/types";
+import { formatCurrency, DEFAULT_RATES } from "@/utils/currency";
+import React, { useMemo } from "react";
 
 type Metric = {
   id: string;
@@ -8,7 +9,6 @@ type Metric = {
   sub?: string;
   tone?: "default" | "positive" | "negative";
 };
-
 
 
 const MetricCard: React.FC<{ metric: Metric }> = ({ metric }) => {
@@ -34,7 +34,32 @@ const MetricCard: React.FC<{ metric: Metric }> = ({ metric }) => {
   );
 };
 
-export default function Metrics() {
+export default function Metrics({ claimsData }: { claimsData: ClaimsQueryResult | undefined }) {
+    const data = useMemo(() => {
+        let total_estimated_loss = 0;
+        let total_paid = 0;
+        let outstanding_balance = 0
+
+        for (const total of claimsData?.totals || []) {
+            if (total.currency === "USD") {
+                total_estimated_loss += parseFloat(total.total_estimated);
+                total_paid += parseFloat(total.total_paid);
+                outstanding_balance += parseFloat(total.total_outstanding);
+            } else {
+                // Convert to USD using the DEFAULT_RATES
+                total_estimated_loss += parseFloat(total.total_estimated) * (DEFAULT_RATES[total.currency]?.USD || 1);
+                total_paid += parseFloat(total.total_paid) * (DEFAULT_RATES[total.currency]?.USD || 1);
+                outstanding_balance += parseFloat(total.total_outstanding) * (DEFAULT_RATES[total.currency]?.USD || 1);
+            }
+        }
+
+        return {
+            total_estimated_loss,
+            total_paid,
+            outstanding_balance,
+        }
+    }, [claimsData?.totals])
+
   // Mock data
   const primaryCurrency = "USD";
   const mock = {
@@ -48,26 +73,26 @@ export default function Metrics() {
     {
       id: "claims",
       label: "Total Claims",
-      value: `${mock.totalClaims} Registered`,
+      value: `${claimsData?.claims.length || 0} Registered`,
       sub: "All statuses",
     },
     {
       id: "estimated",
       label: "Total Estimated Loss",
-      value: formatCurrency(mock.totalEstimatedLoss, primaryCurrency),
+      value: formatCurrency(data.total_estimated_loss, primaryCurrency),
       sub: `Primary: ${primaryCurrency}`,
     },
     {
       id: "paid",
       label: "Total Paid",
-      value: formatCurrency(mock.totalPaid, primaryCurrency),
+      value: formatCurrency(data.total_paid, primaryCurrency),
       tone: "positive",
       sub: "Settled claims",
     },
     {
       id: "outstanding",
       label: "Outstanding Balance",
-      value: formatCurrency(mock.outstandingBalance, primaryCurrency),
+      value: formatCurrency(data.outstanding_balance, primaryCurrency),
       tone: "negative",
       sub: "Unsettled claims",
     },

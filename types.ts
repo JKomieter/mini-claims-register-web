@@ -29,16 +29,18 @@ export interface Payment {
 export interface Total {
     currency: Currency;
     total_estimated: string;    
+    total_approved: string;
+    total_paid: string;
     total_outstanding: string;
 }
 
 export interface ClaimsQueryResult {
-    claim: Claim;
+    claims: Claim[];
     totals: Total[];
 }
 
 export interface ClaimQueryResult {
-    claims: Claim[];
+    claim: Claim;
     payments: Payment[];
 }
 
