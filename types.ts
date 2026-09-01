@@ -1,4 +1,5 @@
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'GHS'
+export type ClaimStatus = "Reserved, not yet settled" | "Settled, payment outstanding" | "Settled and paid"
 
 export interface Claim {
     id: string;
@@ -10,6 +11,9 @@ export interface Claim {
     currency: Currency;
     estimated_loss_amount: number;
     approved_amount: number | null;
+    total_paid: number | null;
+    outstanding_balance: number | null;
+    claim_status: ClaimStatus;
     created_at: string;
     updated_at: string;
 }

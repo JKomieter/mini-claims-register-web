@@ -14,20 +14,22 @@ type Metric = {
 const MetricCard: React.FC<{ metric: Metric }> = ({ metric }) => {
   const toneClass =
     metric.tone === "positive"
-      ? "text-green-600 dark:text-green-300"
+      ? "text-green-600 dark:text-green-400"
       : metric.tone === "negative"
-      ? "text-red-600 dark:text-red-300"
+      ? "text-red-600 dark:text-red-400"
       : "text-foreground";
 
   return (
-    <div className="bg-card text-card-foreground rounded-lg border border-border p-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm font-medium text-muted-foreground">{metric.label}</div>
-          <div className={`mt-1 text-2xl font-semibold ${toneClass}`}>{metric.value}</div>
+    <div className="bg-card text-card-foreground rounded-xl border border-border p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex flex-col">
+        <div className="text-xs sm:text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+          {metric.label}
+        </div>
+        <div className={`text-2xl sm:text-3xl font-bold mb-2 ${toneClass}`}>
+          {metric.value}
         </div>
         {metric.sub ? (
-          <div className="text-xs text-muted-foreground text-right">{metric.sub}</div>
+          <div className="text-xs text-muted-foreground">{metric.sub}</div>
         ) : null}
       </div>
     </div>
@@ -60,14 +62,7 @@ export default function Metrics({ claimsData }: { claimsData: ClaimsQueryResult 
         }
     }, [claimsData?.totals])
 
-  // Mock data
   const primaryCurrency = "USD";
-  const mock = {
-    totalClaims: 15,
-    totalEstimatedLoss: 125000, // in primaryCurrency - USD
-    totalPaid: 42000,
-    outstandingBalance: 83000,
-  };
 
   const metrics: Metric[] = [
     {
@@ -100,14 +95,14 @@ export default function Metrics({ claimsData }: { claimsData: ClaimsQueryResult 
 
   return (
     <section aria-labelledby="top-metrics" className="w-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 id="top-metrics" className="text-lg font-semibold">
-          Top metrics
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h2 id="top-metrics" className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-0">
+          Key Metrics
         </h2>
-        <div className="text-sm text-muted-foreground">Updated just now</div>
+        <div className="text-xs sm:text-sm text-muted-foreground">Updated just now</div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {metrics.map((m) => (
           <MetricCard key={m.id} metric={m} />
         ))}
