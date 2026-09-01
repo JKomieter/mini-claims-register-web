@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { ClaimStatus } from "@/types";
 
-type StatusOption = "all" | "reserved" | "outstanding" | "paid";
-type CurrencyOption = "USD" | "GHS" | "GBP" | "EUR";
+type CurrencyOption = "USD" | "GHS" | "GBP" | "EUR" | "all";
 
 interface FilterSelectProps {
   label: string;
@@ -26,10 +26,12 @@ interface FilterBarProps {
   endDate?: Date;
   onStartDateChange: (date: Date | undefined) => void;
   onEndDateChange: (date: Date | undefined) => void;
-  status: StatusOption;
-  onStatusChange: (status: StatusOption) => void;
+  status: ClaimStatus | "all";
+  onStatusChange: (status: ClaimStatus | "all") => void;
   currency: CurrencyOption;
   onCurrencyChange: (currency: CurrencyOption) => void;
+  onRegisterClaimClick: () => void;
+  onRecordPaymentClick: () => void;
 }
 
 const FilterSelect: React.FC<FilterSelectProps> = ({
@@ -75,6 +77,8 @@ export default function FilterBar({
   onStatusChange,
   currency,
   onCurrencyChange,
+  onRegisterClaimClick,
+  onRecordPaymentClick,
 }: FilterBarProps) {
   const [calendarMode, setCalendarMode] = useState<"start" | "end">("start");
 
@@ -166,12 +170,12 @@ export default function FilterBar({
             <FilterSelect
               label="Claim Status"
               value={status}
-              onChange={(e) => onStatusChange(e.target.value as StatusOption)}
+              onChange={(e) => onStatusChange(e.target.value as ClaimStatus | "all")}
               options={[
                 { value: "all", label: "All statuses" },
-                { value: "reserved", label: "Reserved, not yet settled" },
-                { value: "outstanding", label: "Settled, payment outstanding" },
-                { value: "paid", label: "Settled and paid" },
+                  { value: "Reserved, not yet settled", label: "Reserved, not yet settled" },
+                  { value: "Settled, payment outstanding", label: "Settled, payment outstanding" },
+                  { value: "Settled and paid", label: "Settled and paid" },
               ]}
             />
 
@@ -180,6 +184,7 @@ export default function FilterBar({
               value={currency}
               onChange={(e) => onCurrencyChange(e.target.value as CurrencyOption)}
               options={[
+                { value: "all", label: "All currencies" },
                 { value: "USD", label: "USD" },
                 { value: "GHS", label: "GHS" },
                 { value: "GBP", label: "GBP" },
@@ -199,9 +204,7 @@ export default function FilterBar({
               variant="default"
               size="sm"
               className="h-10 px-4 font-semibold shadow-sm hover:shadow-md transition-shadow"
-              onClick={() => {
-                console.log("Register New Claim");
-              }}
+              onClick={onRegisterClaimClick}
             >
               <span>+</span>
               <span className="ml-1.5">Register Claim</span>
@@ -210,9 +213,7 @@ export default function FilterBar({
               variant="outline"
               size="sm"
               className="h-10 px-4 font-semibold"
-              onClick={() => {
-                console.log("Record Payment");
-              }}
+              onClick={onRecordPaymentClick}
             >
               <span>+</span>
               <span className="ml-1.5">Record Payment</span>
