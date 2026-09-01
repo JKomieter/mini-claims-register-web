@@ -2,8 +2,15 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 
-type DateRangeOption = "all" | "last7days" | "last30days" | "custom";
 type StatusOption = "all" | "reserved" | "outstanding" | "paid";
 type CurrencyOption = "USD" | "GHS" | "GBP" | "EUR";
 
@@ -12,6 +19,17 @@ interface FilterSelectProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: { value: string; label: string }[];
+}
+
+interface FilterBarProps {
+  startDate?: Date;
+  endDate?: Date;
+  onStartDateChange: (date: Date | undefined) => void;
+  onEndDateChange: (date: Date | undefined) => void;
+  status: StatusOption;
+  onStatusChange: (status: StatusOption) => void;
+  currency: CurrencyOption;
+  onCurrencyChange: (currency: CurrencyOption) => void;
 }
 
 const FilterSelect: React.FC<FilterSelectProps> = ({
@@ -48,10 +66,35 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
   </div>
 );
 
-export default function FilterBar() {
-  const [dateRange, setDateRange] = useState<DateRangeOption>("all");
-  const [status, setStatus] = useState<StatusOption>("all");
-  const [currency, setCurrency] = useState<CurrencyOption>("USD");
+export default function FilterBar({
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
+  status,
+  onStatusChange,
+  currency,
+  onCurrencyChange,
+}: FilterBarProps) {
+  const [calendarMode, setCalendarMode] = useState<"start" | "end">("start");
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (calendarMode === "start") {
+      onStartDateChange(date);
+      setCalendarMode("end");
+    } else {
+      onEndDateChange(date);
+    }
+  };
+
+  const dateRangeLabel = () => {
+    if (!startDate && !endDate) return "Select date range";
+    if (startDate && !endDate) return format(startDate, "MMM d, yyyy");
+    if (startDate && endDate) {
+      return `${format(startDate, "MMM d")} - ${format(endDate, "MMM d, yyyy")}`;
+    }
+    return "Select date range";
+  };
 
   return (
     <div className="w-full">
@@ -70,22 +113,60 @@ export default function FilterBar() {
         {/* Filters Section */}
         <div className="p-6 border-b border-border/50">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <FilterSelect
-              label="Date Range"
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value as DateRangeOption)}
-              options={[
-                { value: "all", label: "All dates" },
-                { value: "last7days", label: "Last 7 days" },
-                { value: "last30days", label: "Last 30 days" },
-                { value: "custom", label: "Custom range" },
-              ]}
-            />
+            {/* Date Range Picker with Calendar */}
+            <div className="flex flex-col gap-2.5 flex-1">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-widest opacity-75">
+                Date Range
+              </label>
+              <Popover>
+                <PopoverTrigger className="h-10 px-3.5 py-2 rounded-lg border border-border bg-background text-foreground text-sm font-medium
+                  hover:bg-muted/50 hover:border-border/80 transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
+                  cursor-pointer flex items-center justify-start gap-2">
+                  <CalendarIcon className="h-4 w-4" />
+                  <span>{dateRangeLabel()}</span>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <div className="flex flex-col gap-4 p-4">
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">
+                        {calendarMode === "start" ? "Select Start Date" : "Select End Date"}
+                      </p>
+                      <Calendar
+                        mode="single"
+                        selected={calendarMode === "start" ? startDate : endDate}
+                        onSelect={handleDateSelect}
+                        disabled={(date) => {
+                          if (calendarMode === "end" && startDate) {
+                            return date < startDate;
+                          }
+                          return false;
+                        }}
+                      />
+                    </div>
+                    {startDate && endDate && (
+                      <button
+                        className="h-9 px-3 rounded-md border border-border bg-background text-foreground text-xs font-medium
+                          hover:bg-muted/50 transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-ring"
+                        onClick={() => {
+                          onStartDateChange(undefined);
+                          onEndDateChange(undefined);
+                          setCalendarMode("start");
+                        }}
+                      >
+                        Clear Dates
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
 
             <FilterSelect
               label="Claim Status"
               value={status}
-              onChange={(e) => setStatus(e.target.value as StatusOption)}
+              onChange={(e) => onStatusChange(e.target.value as StatusOption)}
               options={[
                 { value: "all", label: "All statuses" },
                 { value: "reserved", label: "Reserved, not yet settled" },
@@ -97,7 +178,7 @@ export default function FilterBar() {
             <FilterSelect
               label="Primary Currency"
               value={currency}
-              onChange={(e) => setCurrency(e.target.value as CurrencyOption)}
+              onChange={(e) => onCurrencyChange(e.target.value as CurrencyOption)}
               options={[
                 { value: "USD", label: "USD" },
                 { value: "GHS", label: "GHS" },
