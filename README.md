@@ -39,9 +39,7 @@ To run this project on your local machine, follow these steps:
 
 4. Set up environment variables for both frontend and backend. Create a `.env` file in the root of each directory and add the necessary variables:
 
-    ```env
-    
-    ```
+    No environment variables needed
 
 5. Start the development server:
 
