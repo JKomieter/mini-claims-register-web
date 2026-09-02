@@ -4,9 +4,9 @@ A full-stack web application designed to track insurance claims, record multi-cu
 
 ## 🚀Live Demo & Repository
 
-- Live URL: [Insert Vercel / Render / Railway Link Here]
+- Live URL: [Link](https://mini-claims-register-web.vercel.app/)
 
-- GitHub Repository: [[Link]](https://github.com/JKomieter/mini-claims-register-web.git)
+- GitHub Repository: [Link](https://github.com/JKomieter/mini-claims-register-web.git)
 
 ## 🛠️Tech Stack
 
