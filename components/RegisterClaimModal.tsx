@@ -22,6 +22,7 @@ type RegisterClaimForm = {
   lossNature: string;
   currency: "USD" | "GHS" | "GBP" | "EUR";
   estimatedLossAmount: string;
+  approvedAmount: string; // Optional on registration
 };
 
 const initialForm: RegisterClaimForm = {
@@ -31,6 +32,7 @@ const initialForm: RegisterClaimForm = {
   lossNature: "",
   currency: "USD",
   estimatedLossAmount: "",
+  approvedAmount: "",
 };
 
 interface RegisterClaimModalProps {
@@ -47,6 +49,11 @@ export default function RegisterClaimModal({
 
   const createClaim = useMutation({
     mutationFn: async (values: RegisterClaimForm) => {
+      // Send approvedAmount as a number if supplied, or null if left empty
+      const parsedApproved = values.approvedAmount.trim() !== ""
+        ? Number(values.approvedAmount)
+        : null;
+
       const response = await fetch(`${API_URL}/claims`, {
         method: "POST",
         headers: {
@@ -59,6 +66,7 @@ export default function RegisterClaimModal({
           lossNature: values.lossNature,
           currency: values.currency,
           estimatedLossAmount: Number(values.estimatedLossAmount),
+          approvedAmount: parsedApproved,
         }),
       });
 
@@ -98,6 +106,21 @@ export default function RegisterClaimModal({
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Client-side validation: DB constraint chk_dates (date_notified >= loss_date)
+    if (form.lossDate && form.dateNotified) {
+      const loss = new Date(form.lossDate);
+      const notified = new Date(form.dateNotified);
+      if (notified < loss) {
+        toast.add({
+          title: "Invalid dates",
+          description: "Date Notified cannot be earlier than Loss Date.",
+          type: "error",
+        });
+        return;
+      }
+    }
+
     createClaim.mutate(form);
   };
 
@@ -185,7 +208,7 @@ export default function RegisterClaimModal({
 
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground">
-                Estimated Loss Amount
+                Estimated Loss Amount ({form.currency})
               </label>
               <input
                 type="number"
@@ -197,6 +220,26 @@ export default function RegisterClaimModal({
                 placeholder="2500.00"
                 required
               />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-muted-foreground">
+                  Approved Amount ({form.currency}) — <span className="text-muted-foreground/70 font-normal">Optional</span>
+                </label>
+              </div>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.approvedAmount}
+                onChange={(e) => updateField("approvedAmount", e.target.value)}
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Leave blank if claim is still reserved/unapproved"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Leaving this blank sets the status to <span className="font-semibold text-amber-600">Reserved, not yet settled</span>. Setting an amount marks it as <span className="font-semibold text-blue-600">Settled, payment outstanding</span>.
+              </p>
             </div>
           </div>
 
