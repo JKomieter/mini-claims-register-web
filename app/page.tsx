@@ -9,10 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import RecordPaymentModal from "@/components/RecordPaymentModal";
+import { API_URL } from "@/constants";
 
 type CurrencyOption = "USD" | "GHS" | "GBP" | "EUR" | "all";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export default function Home() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);

@@ -15,8 +15,8 @@ import {
 import { toast } from "@/components/ui/toast";
 import { Payment } from "@/types";
 import { ClaimQueryResult } from '../types';
+import { API_URL } from "@/constants";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface ViewEditClaimModalProps {
     claimId: string | null;

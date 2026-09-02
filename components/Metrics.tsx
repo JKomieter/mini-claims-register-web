@@ -1,9 +1,7 @@
-import { ClaimsQueryResult } from "@/types";
-import { formatCurrency, DEFAULT_RATES } from "@/utils/currency";
+import { API_URL } from "@/constants";
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo } from "react";
+import React from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 
 type Metric = {

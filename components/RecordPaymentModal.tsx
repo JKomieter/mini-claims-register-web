@@ -14,8 +14,8 @@ import {
 import { toast } from "@/components/ui/toast";
 import { Claim, Currency } from "@/types";
 import { DEFAULT_RATES } from '@/utils/currency';
+import { API_URL } from "@/constants";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface RecordPaymentModalProps {
     open: boolean;
