@@ -6,7 +6,7 @@ A full-stack web application designed to track insurance claims, record multi-cu
 
 - Live URL: [Insert Vercel / Render / Railway Link Here]
 
-- GitHub Repository: [Insert Repository Link Here]
+- GitHub Repository: [[Link]](https://github.com/JKomieter/mini-claims-register-web.git)
 
 ## 🛠️Tech Stack
 
@@ -22,7 +22,7 @@ To run this project on your local machine, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone [Insert Repository Link Here]
+   git clone https://github.com/JKomieter/mini-claims-register-web.git
    ```
 
 2. Navigate to the project directory:
