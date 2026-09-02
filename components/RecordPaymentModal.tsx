@@ -34,6 +34,7 @@ export default function RecordPaymentModal({
     const [amount, setAmount] = useState<string>("");
     const [currency, setCurrency] = useState<Currency>("USD");
     const [exchangeRate, setExchangeRate] = useState<number>(1);
+    const [referenceNote, setReferenceNote] = useState<string>("");
 
     // Derive the currently selected claim
     const selectedClaim = useMemo(
@@ -100,6 +101,7 @@ export default function RecordPaymentModal({
             amount: string;
             currency: Currency;
             exchangeRate: number;
+            referenceNote: string;
         }) => {
             // if claim has not being approved, do not record payment
             const approvedAmount = claims?.find((claim) => claim.id === values.claimId)?.approved_amount;
@@ -115,6 +117,7 @@ export default function RecordPaymentModal({
                     amount: Number(values.amount),
                     currency: values.currency,
                     exchangeRate: Number(values.exchangeRate),
+                    referenceNote: values.referenceNote,
                 }),
             });
 
@@ -133,6 +136,7 @@ export default function RecordPaymentModal({
             });
             queryClient.invalidateQueries({ queryKey: ["claims"] });
             setAmount("");
+            setReferenceNote("");
             onOpenChange(false);
         },
         onError: (error: Error) => {
@@ -153,6 +157,7 @@ export default function RecordPaymentModal({
             amount,
             currency,
             exchangeRate: isCrossCurrency ? exchangeRate : 1,
+            referenceNote,
         });
     };
 
@@ -230,13 +235,26 @@ export default function RecordPaymentModal({
                                     step="0.000001"
                                     min="0.000001"
                                     value={exchangeRate}
-                                    // onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
                                     className="h-8 w-32 rounded border border-amber-300 bg-white px-2 text-right font-mono text-sm outline-none focus:ring-2 focus:ring-amber-500"
                                     required
                                 />
                             </div>
                         </div>
                     )}
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">
+                            Reference Note (Optional)
+                        </label>
+                        <input
+                            type="text"
+                            value={referenceNote}
+                            onChange={(e) => setReferenceNote(e.target.value)}
+                            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                            placeholder="e.g. Wire transfer ref #98124"
+                        />
+                    </div>
 
                     {/* Real-time financial output preview */}
                     {helperText && (
