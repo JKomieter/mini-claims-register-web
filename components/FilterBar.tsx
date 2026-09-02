@@ -100,6 +100,14 @@ export default function FilterBar({
     return "Select date range";
   };
 
+  const clearAllFilters = () => {
+    onStartDateChange(undefined);
+    onEndDateChange(undefined);
+    onStatusChange("all");
+    onCurrencyChange("all");
+    setCalendarMode("start");
+  }
+
   return (
     <div className="w-full">
       {/* Main Filter Card */}
@@ -218,9 +226,17 @@ export default function FilterBar({
               <span>+</span>
               <span className="ml-1.5">Record Payment</span>
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 px-4 font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              onClick={clearAllFilters}
+            >
+              Clear All Filters
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+      </div>
   );
 }
