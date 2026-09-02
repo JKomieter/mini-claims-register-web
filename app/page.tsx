@@ -22,6 +22,7 @@ export default function Home() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
@@ -85,6 +86,7 @@ export default function Home() {
 
           <ClaimsTable
             claims={claimsData?.claims || []}
+            totals={claimsData?.totals || []}
             selectedRows={selectedRows}
             onSelectedRowsChange={setSelectedRows}
           />
